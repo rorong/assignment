@@ -1,0 +1,33 @@
+<div class="container">
+  <h1>Edit Organization</h1>
+
+  <%= form_with(model: @organization, local: true) do |form| %>
+    <% if @organization.errors.any? %>
+      <div class="alert alert-danger">
+        <h4><%= pluralize(@organization.errors.count, "error") %> prohibited this organization from being saved:</h4>
+        <ul>
+          <% @organization.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="mb-3">
+      <%= form.label :name, class: "form-label" %>
+      <%= form.text_field :name, class: "form-control" %>
+    </div>
+
+    <div class="mb-3">
+      <%= form.label :description, class: "form-label" %>
+      <%= form.text_area :description, rows: 4, class: "form-control" %>
+    </div>
+
+    <div class="mb-3">
+      <%= form.submit "Update Organization", class: "btn btn-primary" %>
+      <%= link_to "Cancel", @organization, class: "btn btn-secondary" %>
+      <%= link_to "Delete Organization", @organization, method: :delete, 
+                  data: { confirm: "Are you sure?" }, class: "btn btn-danger" %>
+    </div>
+  <% end %>
+</div> 

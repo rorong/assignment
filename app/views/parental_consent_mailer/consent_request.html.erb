@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <style>
+      body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+      .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+      .header { background: #007bff; color: white; padding: 20px; text-align: center; }
+      .content { padding: 20px; background: #f8f9fa; }
+      .button { display: inline-block; padding: 12px 24px; margin: 10px; text-decoration: none; border-radius: 5px; font-weight: bold; }
+      .btn-approve { background: #28a745; color: white; }
+      .btn-reject { background: #dc3545; color: white; }
+      .info-box { background: #e9ecef; padding: 15px; border-radius: 5px; margin: 15px 0; }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>🛡️ Parental Consent Required</h1>
+      </div>
+      
+      <div class="content">
+        <h2>Hello Parent/Guardian,</h2>
+        
+        <p>Your child <strong><%= @user.first_name %> <%= @user.last_name %></strong> has requested to create an account on our platform.</p>
+        
+        <div class="info-box">
+          <h3>📋 Child's Information:</h3>
+          <ul>
+            <li><strong>Name:</strong> <%= @user.first_name %> <%= @user.last_name %></li>
+            <li><strong>Email:</strong> <%= @user.email %></li>
+            <li><strong>Age:</strong> <%= @user.age %> years old</li>
+            <li><strong>Birth Date:</strong> <%= @user.birth_date.strftime("%B %d, %Y") %></li>
+          </ul>
+        </div>
+
+        <div class="info-box">
+          <h3>🎯 Platform Features:</h3>
+          <ul>
+            <li>Join educational organizations</li>
+            <li>Participate in age-appropriate activities</li>
+            <li>Connect with peers in supervised environments</li>
+            <li>Access to parental oversight features</li>
+          </ul>
+        </div>
+
+        <div class="info-box">
+          <h3>⚠️ Important Information:</h3>
+          <p>By approving this consent, you acknowledge that:</p>
+          <ul>
+            <li>Your child will be able to join organizations on our platform</li>
+            <li>All activities are supervised and age-appropriate</li>
+            <li>You can revoke consent at any time by contacting support</li>
+            <li>Your child's data will be handled according to our privacy policy</li>
+          </ul>
+        </div>
+
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="<%= @consent_url %>" class="button btn-approve">✅ Approve Consent</a>
+          <a href="<%= @consent_url %>" class="button btn-reject">❌ View Options</a>
+        </div>
+
+        <p><small>This consent link is secure and unique to your child's account. If you did not expect this email, please ignore it.</small></p>
+      </div>
+    </div>
+  </body>
+</html> 

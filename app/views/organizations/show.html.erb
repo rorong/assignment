@@ -1,0 +1,182 @@
+<div class="container">
+  <div class="row">
+    <div class="col-md-8">
+      <h1><%= @organization.name %></h1>
+      <p class="lead"><%= @organization.description %></p>
+      
+      <div class="mb-3">
+        <strong>Admin:</strong> <%= @organization.admin.first_name %> <%= @organization.admin.last_name %>
+      </div>
+      
+      <div class="mb-3">
+        <strong>Total Members:</strong> <%= @organization.organization_memberships.approved.count %>
+      </div>
+
+      <!-- Membership Actions -->
+      <div class="mb-4">
+        <% if @membership %>
+          <% if @membership.approved? %>
+            <div class="alert alert-success">
+              <i class="fas fa-check-circle me-2"></i>
+              You are a <strong><%= @membership.role.capitalize %></strong> of this organization
+            </div>
+          <% else %>
+            <div class="alert alert-warning">
+              <i class="fas fa-clock me-2"></i>
+              Your membership request is pending approval
+            </div>
+          <% end %>
+        <% else %>
+          <% if can? :join, @organization %>
+            <% if current_user.minor? && current_user.has_parental_consent? %>
+              <div class="alert alert-info mb-3">
+                <i class="fas fa-info-circle me-2"></i>
+                <strong>Minor with Parental Consent:</strong> You can join this organization since you have parental consent.
+              </div>
+            <% end %>
+            <%= button_to 'Join Organization', join_organization_path(@organization), 
+                method: :post,
+                class: 'btn btn-success',
+                data: { confirm: 'Are you sure you want to request membership?' } %>
+          <% else %>
+            <div class="alert alert-warning">
+              <i class="fas fa-exclamation-triangle me-2"></i>
+              <% if current_user.minor? && !current_user.has_parental_consent? %>
+                <strong>Parental Consent Required:</strong> You need approved parental consent to join organizations.
+                <% if current_user.parental_consent_status == 'pending' %>
+                  <br><small>Your consent request is pending approval from your parent/guardian.</small>
+                <% elsif current_user.parental_consent_status == 'rejected' %>
+                  <br><small>Your parent/guardian has not approved your participation.</small>
+                <% end %>
+              <% else %>
+                You cannot join this organization.
+              <% end %>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-header">
+          <h5>Organization Info</h5>
+        </div>
+        <div class="card-body">
+          <p><strong>Created:</strong> <%= @organization.created_at.strftime("%B %d, %Y") %></p>
+          <p><strong>Members:</strong> <%= @organization.organization_memberships.approved.count %></p>
+          
+          <% if can? :manage, @organization %>
+            <hr>
+            <h6>Admin Actions</h6>
+            <%= link_to "Edit Organization", edit_organization_path(@organization), class: "btn btn-sm btn-outline-primary" %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Section: Pending Member Requests -->
+  <% if can?(:manage, @organization) && @pending_members.any? %>
+    <div class="row mt-4">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            <h5>Pending Member Requests</h5>
+          </div>
+          <div class="card-body">
+            <% @pending_members.each do |membership| %>
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <div>
+                  <strong><%= membership.user.first_name %> <%= membership.user.last_name %></strong>
+                  <small class="text-muted">(<%= membership.user.email %>)</small>
+                  <% if membership.user.minor? %>
+                    <span class="badge bg-info">Minor</span>
+                  <% end %>
+                </div>
+                <div>
+                  <%= button_to "Approve", approve_member_organization_path(@organization, membership_id: membership.id), 
+                              method: :patch, 
+                              data: { turbo_method: :patch }, 
+                              class: "btn btn-sm btn-success" %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Members List -->
+  <div class="row mt-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h5>Members</h5>
+        </div>
+        <div class="card-body">
+          <% @organization.organization_memberships.approved.includes(:user).each do |membership| %>
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <div>
+                <strong><%= membership.user.first_name %> <%= membership.user.last_name %></strong>
+                <span class="badge bg-<%= membership.role == 'admin' ? 'primary' : 'secondary' %>">
+                  <%= membership.role.capitalize %>
+                </span>
+                <% if membership.user.minor? %>
+                  <span class="badge bg-info">Minor</span>
+                <% end %>
+              </div>
+              <div>
+                <% if can?(:manage, @organization) && membership.role != 'admin' %>
+                  <%= link_to "Remove", remove_member_organization_path(@organization, membership_id: membership.id), 
+                              method: :delete, 
+                              data: { confirm: "Are you sure you want to remove this member?" }, 
+                              class: "btn btn-sm btn-outline-danger" %>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <% if can? :manage, @organization %>
+    <div class="card mb-4">
+      <div class="card-header">
+        <h5 class="mb-0">
+          <i class="fas fa-chart-bar me-2"></i>Organization Analytics
+        </h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-3">
+            <div class="text-center">
+              <h3 class="text-primary"><%= @organization.organization_memberships.approved.count %></h3>
+              <small class="text-muted">Total Members</small>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="text-center">
+              <h3 class="text-warning"><%= @organization.organization_memberships.pending.count %></h3>
+              <small class="text-muted">Pending Requests</small>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="text-center">
+              <h3 class="text-success"><%= @organization.organization_memberships.approved.joins(:user).where('users.birth_date > ?', 18.years.ago).count %></h3>
+              <small class="text-muted">Adult Members</small>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="text-center">
+              <h3 class="text-info"><%= @organization.organization_memberships.approved.joins(:user).where('users.birth_date <= ?', 18.years.ago).count %></h3>
+              <small class="text-muted">Minor Members</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>

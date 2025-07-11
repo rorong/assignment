@@ -1,0 +1,68 @@
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow-lg">
+        <div class="card-header bg-warning text-dark text-center">
+          <h4 class="mb-0">
+            <i class="fas fa-child me-2"></i>Parental Consent Required
+          </h4>
+        </div>
+        <div class="card-body p-4">
+          <div class="alert alert-info">
+            <h5><i class="fas fa-info-circle me-2"></i>Consent Request</h5>
+            <p>Your child <strong><%= @user.first_name %> <%= @user.last_name %></strong> has requested to join our platform.</p>
+          </div>
+
+          <div class="row mb-4">
+            <div class="col-md-6">
+              <h6>Child's Information:</h6>
+              <ul class="list-unstyled">
+                <li><strong>Name:</strong> <%= @user.first_name %> <%= @user.last_name %></li>
+                <li><strong>Email:</strong> <%= @user.email %></li>
+                <li><strong>Age:</strong> <%= @user.age %> years old</li>
+                <li><strong>Birth Date:</strong> <%= @user.birth_date.strftime("%B %d, %Y") %></li>
+              </ul>
+            </div>
+            <div class="col-md-6">
+              <h6>Platform Features:</h6>
+              <ul>
+                <li>Join educational organizations</li>
+                <li>Participate in age-appropriate activities</li>
+                <li>Connect with peers in supervised environments</li>
+                <li>Access to parental oversight features</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="alert alert-warning">
+            <h6><i class="fas fa-exclamation-triangle me-2"></i>Important Information</h6>
+            <p>By approving this consent, you acknowledge that:</p>
+            <ul class="mb-0">
+              <li>Your child will be able to join organizations on our platform</li>
+              <li>All activities are supervised and age-appropriate</li>
+              <li>You can revoke consent at any time by contacting support</li>
+              <li>Your child's data will be handled according to our privacy policy</li>
+            </ul>
+          </div>
+
+          <div class="d-flex justify-content-center gap-3">
+            <%= button_to 'Approve Consent', approve_parental_consent_path(@user.parental_consent_token), 
+                method: :patch, 
+                class: 'btn btn-success btn-lg',
+                data: { confirm: 'Are you sure you want to approve consent for your child?' } %>
+            
+            <%= button_to 'Reject Consent', reject_parental_consent_path(@user.parental_consent_token), 
+                method: :patch, 
+                class: 'btn btn-danger btn-lg',
+                data: { confirm: 'Are you sure you want to reject consent?' } %>
+          </div>
+        </div>
+        <div class="card-footer text-center bg-light">
+          <small class="text-muted">
+            This consent link was sent to: <%= @user.parent_email %>
+          </small>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

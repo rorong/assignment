@@ -1,0 +1,177 @@
+<div class="container">
+  <% if user_signed_in? %>
+    <!-- Hero Section -->
+    <div class="row mb-5">
+      <div class="col-12">
+        <div class="bg-primary text-white rounded p-5 text-center">
+          <h1 class="display-4">Welcome back, <%= current_user.first_name %>!</h1>
+          <p class="lead">
+            Age: <%= current_user.age %> years old
+            <% if current_user.minor? %>
+              <span class="badge bg-light text-dark ms-2">
+                <i class="fas fa-child"></i> Minor Account
+              </span>
+            <% end %>
+          </p>
+          
+          <% if current_user.minor? %>
+            <div class="mt-3">
+              <% if current_user.needs_parental_consent? %>
+                <div class="alert alert-warning d-inline-block">
+                  <i class="fas fa-exclamation-triangle"></i>
+                  Parental consent required for full access
+                </div>
+              <% else %>
+                <div class="alert alert-success d-inline-block">
+                  <i class="fas fa-check-circle"></i>
+                  Parental consent approved
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <!-- Organizations Section -->
+      <div class="col-md-8">
+        <div class="card shadow">
+          <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">
+              <i class="fas fa-users"></i> Your Organizations
+            </h4>
+          </div>
+          <div class="card-body">
+            <% if current_user.organizations.any? %>
+              <div class="row">
+                <% current_user.organizations.each do |org| %>
+                  <div class="col-md-6 mb-3">
+                    <div class="card border-primary">
+                      <div class="card-body">
+                        <h6 class="card-title">
+                          <%= link_to org.name, org, class: "text-decoration-none" %>
+                        </h6>
+                        <p class="card-text small text-muted">
+                          <%= truncate(org.description, length: 80) %>
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center">
+                          <small class="text-muted">
+                            <i class="fas fa-user-friends"></i>
+                            <%= org.organization_memberships.approved.count %> members
+                          </small>
+                          <%= link_to "View", org, class: "btn btn-outline-primary btn-sm" %>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                <% end %>
+              </div>
+            <% else %>
+              <div class="text-center py-4">
+                <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                <h5>No organizations yet</h5>
+                <p class="text-muted">Join an organization to get started!</p>
+              </div>
+            <% end %>
+            
+            <div class="text-center mt-4">
+              <%= link_to organizations_path, class: "btn btn-primary" do %>
+                <i class="fas fa-search"></i> Browse Organizations
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions Sidebar -->
+      <div class="col-md-4">
+        <div class="card shadow">
+          <div class="card-header bg-success text-white">
+            <h5 class="mb-0">
+              <i class="fas fa-bolt"></i> Quick Actions
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="d-grid gap-2">
+              <%= link_to organizations_path, class: "btn btn-outline-primary" do %>
+                <i class="fas fa-list"></i> View All Organizations
+              <% end %>
+              
+              <% if can? :create, Organization %>
+                <%= link_to new_organization_path, class: "btn btn-outline-success" do %>
+                  <i class="fas fa-plus"></i> Create Organization
+                <% end %>
+              <% else %>
+                <button class="btn btn-outline-secondary" disabled>
+                  <i class="fas fa-lock"></i> Create Organization
+                  <small class="d-block">Restricted for minors</small>
+                </button>
+              <% end %>
+              
+              <%= link_to edit_user_registration_path, class: "btn btn-outline-info" do %>
+                <i class="fas fa-user-edit"></i> Edit Profile
+              <% end %>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stats Card -->
+        <div class="card shadow mt-4">
+          <div class="card-header bg-info text-white">
+            <h6 class="mb-0">
+              <i class="fas fa-chart-bar"></i> Your Stats
+            </h6>
+          </div>
+          <div class="card-body">
+            <div class="row text-center">
+              <div class="col-6">
+                <h4 class="text-primary"><%= current_user.organizations.count %></h4>
+                <small class="text-muted">Organizations</small>
+              </div>
+              <div class="col-6">
+                <h4 class="text-success"><%= current_user.administered_organizations.count %></h4>
+                <small class="text-muted">Admin Of</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  <% else %>
+    <!-- Landing Page for Non-logged Users -->
+    <div class="row justify-content-center">
+      <div class="col-md-8 text-center">
+        <div class="py-5">
+          <h1 class="display-4 mb-4">Welcome to Assignment 4</h1>
+          <p class="lead mb-4">
+            Custom Authentication & Access Control System
+          </p>
+          <p class="text-muted mb-5">
+            Experience organization-based access control with age-based participation rules
+          </p>
+          
+          <div class="row justify-content-center">
+            <div class="col-md-6">
+              <div class="card shadow">
+                <div class="card-body p-4">
+                  <h5 class="card-title">Get Started</h5>
+                  <p class="card-text">Join organizations and manage your participation</p>
+                  <div class="d-grid gap-2">
+                    <%= link_to new_user_registration_path, class: "btn btn-primary btn-lg" do %>
+                      <i class="fas fa-user-plus"></i> Sign Up
+                    <% end %>
+                    <%= link_to new_user_session_path, class: "btn btn-outline-primary" do %>
+                      <i class="fas fa-sign-in-alt"></i> Sign In
+                    <% end %>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>

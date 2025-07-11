@@ -1,0 +1,26 @@
+Parental Consent Required
+
+Hello Parent/Guardian,
+
+Your child <%= @user.first_name %> <%= @user.last_name %> has requested to create an account on our platform.
+
+Child's Information:
+- Name: <%= @user.first_name %> <%= @user.last_name %>
+- Email: <%= @user.email %>
+- Age: <%= @user.age %> years old
+- Birth Date: <%= @user.birth_date.strftime("%B %d, %Y") %>
+
+Platform Features:
+- Join educational organizations
+- Participate in age-appropriate activities
+- Connect with peers in supervised environments
+- Access to parental oversight features
+
+To approve or reject this consent request, please visit:
+<%= @consent_url %>
+
+This consent link is secure and unique to your child's account.
+If you did not expect this email, please ignore it.
+
+Thank you,
+The Platform Team 
